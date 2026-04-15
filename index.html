@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>where's the deck?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d0d;
+      --green: #52c97a;
+      --green-dim: #286040;
+      --green-bright: #90ffb8;
+      --green-track: #081a0e;
+      --red: #e05555;
+      --text-dim: #1e4028;
+    }
+    body {
+      background: var(--bg);
+      color: var(--green);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      padding: 64px 24px 80px;
+      max-width: 660px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse at center, rgba(82, 201, 122, 0.055) 0%, transparent 68%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    main, header, section, footer, hr { position: relative; z-index: 1; }
+    .site-header { margin-bottom: 64px; }
+    h1 {
+      font-family: 'Alfa Slab One', Georgia, serif;
+      font-size: clamp(3.2rem, 14vw, 6rem);
+      font-weight: normal;
+      letter-spacing: 0.01em;
+      line-height: 0.95;
+      margin-bottom: 18px;
+      background: linear-gradient(160deg, var(--green-bright) 0%, var(--green) 60%, #2a9e58 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(144, 255, 184, 0.22));
+    }
+    .subtitle { color: var(--green-dim); font-size: 0.9rem; letter-spacing: 0.02em; }
+    .status-section { margin-bottom: 44px; }
+    .label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+    .status-message { font-size: 0.95rem; color: var(--green); min-height: 1.6em; transition: opacity 0.35s ease; }
+    .status-message.fading { opacity: 0; }
+    .cursor { display: inline-block; animation: blink 1.1s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .progress-section { margin-bottom: 44px; }
+    .progress-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .progress-pct { font-size: 1.15rem; color: var(--green-bright); text-shadow: 0 0 12px rgba(144, 255, 184, 0.4); }
+    .progress-track { width: 100%; height: 10px; background: var(--green-track); border: 1px solid #143320; border-radius: 6px; overflow: hidden; box-shadow: 0 0 16px rgba(82, 201, 122, 0.08) inset; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green) 0%, var(--green-bright) 100%); border-radius: 6px; transition: width 2.4s ease; position: relative; box-shadow: 0 0 14px rgba(82, 201, 122, 0.55), 0 0 4px rgba(144, 255, 184, 0.3); }
+    .progress-fill::after { content: ''; position: absolute; top: 0; right: 0; width: 24px; height: 100%; background: linear-gradient(to right, transparent, var(--green-bright)); opacity: 0.45; border-radius: 0 6px 6px 0; }
+    .stats { display: flex; gap: 0; margin-top: 24px; flex-wrap: wrap; }
+    .stat { flex: 1; min-width: 140px; padding-right: 24px; }
+    .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+    .stat-value { font-size: 0.9rem; color: var(--green); }
+    .feedback-alert { border-left: 2px solid var(--red); padding: 10px 16px; margin-top: 24px; font-size: 0.82rem; color: var(--red); opacity: 0; transition: opacity 0.4s ease; }
+    .feedback-alert.visible { opacity: 1; }
+    .divider { border: none; border-top: 1px solid #1a1a1a; margin: 64px 0; }
+    .faq-intro { margin-bottom: 40px; }
+    .faq-item { margin-bottom: 32px; }
+    .faq-q { color: var(--green-bright); font-size: 0.92rem; margin-bottom: 8px; }
+    .faq-q::before { content: 'Q  '; color: var(--text-dim); }
+    .faq-a { color: var(--green-dim); font-size: 0.88rem; padding-left: 1.9em; line-height: 1.75; position: relative; }
+    .faq-a::before { content: 'A  '; color: var(--text-dim); position: absolute; left: 0; }
+    footer { margin-top: 80px; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.04em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Where's<br>the deck?</h1>
+    <p class="subtitle">it's almost ready.</p>
+  </header>
+
+  <main>
+    <div class="status-section">
+      <div class="label">current task</div>
+      <div class="status-message" id="statusMsg"><span class="cursor">_</span></div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="label" style="margin-bottom:0">completion</span>
+        <span class="progress-pct" id="progressPct">—</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">time since first request</div>
+          <div class="stat-value" id="timeElapsed">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">revision rounds</div>
+          <div class="stat-value" id="revisionCount">4</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">stakeholders</div>
+          <div class="stat-value">too many</div>
+        </div>
+      </div>
+      <div class="feedback-alert" id="feedbackAlert">
+        &#9873; new feedback received. progress adjusted.
+      </div>
+    </div>
+  </main>
+
+  <hr class="divider">
+
+  <section class="faq">
+    <div class="faq-intro label">frequently asked questions</div>
+
+    <div class="faq-item">
+      <p class="faq-q">When will the deck be ready?</p>
+      <p class="faq-a">When you stop asking.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can you just send what you have?</p>
+      <p class="faq-a">No.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">It's just a few slides, right?</p>
+      <p class="faq-a">Sure.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">How long does a deck actually take?</p>
+      <p class="faq-a">Longer than you think. Shorter than it deserves. Exactly long enough to make everyone involved quietly resentful.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can we do a quick sync about the deck?</p>
+      <p class="faq-a">The sync will take 45 minutes, produce three conflicting opinions, and result in a complete rethinking of the narrative arc. We'll schedule a follow-up to discuss the follow-up.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">I just sent some notes.</p>
+      <p class="faq-a">That's not a question. Also: noted. The progress bar has been updated accordingly.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can you make it more visual?</p>
+      <p class="faq-a">Can you make the content more visual?</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Can you add just one more thing?</p>
+      <p class="faq-a">Yes. [progress bar drops 4%]</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">What's your timeline?</p>
+      <p class="faq-a">What's yours?</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Is the deck done?</p>
+      <p class="faq-a">[gestures at loading bar]</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>wheresthedeck.com &mdash; a creative project management reality check</p>
+  </footer>
+
+  <script>
+    const statuses = [
+      "Aligning 43 text boxes that shifted overnight...",
+      "Translating 'make it pop' into actionable design decisions...",
+      "Reconciling FINAL_v2_REVISED_USE_THIS_ONE.key with FINAL_ACTUAL_FINAL.key...",
+      "Exporting to PDF and discovering every font has changed...",
+      "Waiting for Legal to sign off on slide 7...",
+      "Round 4 of feedback complete. Round 5 incoming.",
+      "Finding a stock photo that doesn't look like a stock photo...",
+      "Re-reading the brief for the 9th time to understand what 'dynamic' means...",
+      "Adding a slide. Removing the slide. Adding half the slide.",
+      "Picking a shade of blue everyone can agree on...",
+      "Waiting for someone to circle back on the direction...",
+      "Rebuilding the timeline graphic from scratch (third time)...",
+      "Someone just asked for a one-pager version of the deck...",
+      "Magic Move applied. Magic Move removed. Magic Move re-applied.",
+      "Kern-ing. So. Much. Kern-ing.",
+      "Waiting for the updated logo files...",
+      "The updated logo files arrived in the wrong format.",
+      "Someone left a comment at 11:52pm. Addressing the comment.",
+      "Moving the logo 2px to the right... moving it back.",
+      "Incorporating contradictory feedback from two different VPs...",
+      "Resizing for 16:9. Resizing for 4:3. Resizing for 16:9.",
+      "Converting to Google Slides because someone doesn't have Keynote...",
+      "Converting back to Keynote because the CEO does.",
+      "Sourcing an image that is 'more diverse but not too staged'...",
+      "Confirming whether 'deck' means 10 slides or 40 slides...",
+      "Slide 1 is perfect. Slide 1 has been changed. Slide 1 is perfect again.",
+      "Untangling grouped objects on slide 9...",
+      "Applying the new brand guidelines that arrived this morning...",
+      "Apologizing to the old brand guidelines.",
+      "The client wants 'more storytelling'. Working on it.",
+      "Compressing the file because it's somehow 380MB...",
+      "Adding slide numbers. Removing slide numbers. Adding slide numbers.",
+      "Figuring out what 'clean but not boring' means to seven different people...",
+      "Someone approved the deck. Someone else has not seen the deck.",
+      "Waiting for the updated headshot from the CEO. Still waiting.",
+      "Writing headline option 1 of 12...",
+      "The headline is 'too clever'. Writing a less clever headline.",
+      "The new headline is 'too safe'. Splitting the difference.",
+      "Headline approved. Headline re-opened.",
+      "Trying to write one headline that works for all audiences simultaneously.",
+      "Coming up with something 'punchy but not aggressive'.",
+      "The headline was perfect. It has been changed. It is gone.",
+      "Adding a gradient to the hero slide...",
+      "The gradient is 'too much'. Dialing it back.",
+      "The gradient is now 'too subtle'. Dialing it forward.",
+      "Adding a subtle glow to the title text...",
+      "The glow is 'distracting'. Removing the glow.",
+      "Adding back a more subtle glow.",
+      "The glow is back. The glow is good. The glow will probably go.",
+      "Applying a drop shadow that took 45 minutes to get right.",
+    ];
+
+    let progress = 94.2;
+    let statusIndex = Math.floor(Math.random() * statuses.length);
+    let revisions = 4;
+
+    const progressFill    = document.getElementById('progressFill');
+    const progressPct     = document.getElementById('progressPct');
+    const statusMsg       = document.getElementById('statusMsg');
+    const feedbackAlert   = document.getElementById('feedbackAlert');
+    const revisionCountEl = document.getElementById('revisionCount');
+
+    function setProgress(val) {
+      progress = Math.max(76, Math.min(98.7, val));
+      progressFill.style.width = progress.toFixed(1) + '%';
+      progressPct.textContent  = progress.toFixed(1) + '%';
+    }
+
+    function showStatus(msg) {
+      statusMsg.innerHTML = msg + '<span class="cursor">_</span>';
+    }
+
+    showStatus(statuses[statusIndex]);
+    setProgress(94.2);
+
+    function creep() {
+      setProgress(progress + (Math.random() * 0.009 + 0.001));
+      setTimeout(creep, 2600 + Math.random() * 2200);
+    }
+
+    function feedbackEvent() {
+      revisions++;
+      revisionCountEl.textContent = revisions;
+      const drop = 3.5 + Math.random() * 7;
+      setProgress(progress - drop);
+      feedbackAlert.classList.add('visible');
+      setTimeout(() => feedbackAlert.classList.remove('visible'), 5500);
+      setTimeout(feedbackEvent, 22000 + Math.random() * 38000);
+    }
+
+    function rotateStatus() {
+      statusMsg.classList.add('fading');
+      setTimeout(() => {
+        statusIndex = (statusIndex + 1) % statuses.length;
+        showStatus(statuses[statusIndex]);
+        statusMsg.classList.remove('fading');
+      }, 350);
+      setTimeout(rotateStatus, 5500 + Math.random() * 3000);
+    }
+
+    const startDate = new Date('2025-01-06T09:17:00');
+
+    function updateElapsed() {
+      const diff = Date.now() - startDate.getTime();
+      const s   = Math.floor(diff / 1000);
+      const d   = Math.floor(s / 86400);
+      const h   = Math.floor((s % 86400) / 3600);
+      const m   = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      document.getElementById('timeElapsed').textContent = d + 'd ' + h + 'h ' + m + 'm ' + sec + 's';
+    }
+
+    updateElapsed();
+    setInterval(updateElapsed, 1000);
+    setTimeout(rotateStatus, 5000 + Math.random() * 1500);
+    setTimeout(creep, 1500);
+    setTimeout(feedbackEvent, 22000 + Math.random() * 38000);
+  </script>
+</body>
+</html>
