@@ -564,88 +564,76 @@
       background: var(--bg);
       transition: background 0.4s ease;
     }
-    .canvas-stage {
-      flex-shrink: 0;
-      height: 40%;
-      min-height: 200px;
-      max-height: 400px;
-      background: var(--chrome-bg-soft);
-      border-bottom: 1px solid var(--chrome-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px 24px;
-      position: relative;
-      transition: background 0.4s ease, border-color 0.4s ease;
-    }
-    .stage-slide {
-      height: 100%;
-      aspect-ratio: 16 / 9;
-      background: linear-gradient(135deg, #f5f5ee 0%, #e8e8df 100%);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.08);
-      overflow: hidden;
-      padding: 28px;
-    }
-    .stage-hero {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 6.5vw, 4.4rem);
-      font-weight: normal;
-      letter-spacing: 0.01em;
-      line-height: 0.95;
-      background: linear-gradient(160deg, var(--green-bright) 0%, var(--green) 60%, var(--green-deep) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 14px var(--glow-bright));
-      text-align: center;
-    }
-    .stage-blank {
-      font-family: var(--font-ui);
-      color: #a8a89e;
-      font-size: clamp(1.4rem, 4.5vw, 2.4rem);
-      font-weight: 300;
-      letter-spacing: -0.018em;
-      display: inline-flex;
-      align-items: center;
-    }
-    .stage-faq {
-      font-family: var(--font-display);
-      color: #2a2a2a;
-      font-size: clamp(1.4rem, 4.5vw, 2.6rem);
-      text-align: center;
-      letter-spacing: 0.005em;
-      line-height: 1.05;
-    }
-    .canvas-notes {
+    .canvas-scroll {
       flex: 1;
       overflow-y: auto;
       background: var(--bg);
       position: relative;
       transition: background 0.4s ease;
     }
-    .notes-inner {
+    .canvas-inner {
       max-width: 660px;
       margin: 0 auto;
-      padding: 36px 32px 80px;
+      padding: 64px 32px 64px;
       position: relative;
     }
-    .notes-inner::before {
+    .canvas-inner::before {
       content: '';
       position: absolute;
-      top: 0;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: 700px;
-      height: 400px;
+      height: 500px;
       background: radial-gradient(ellipse at center, var(--glow-soft) 0%, transparent 68%);
       pointer-events: none;
       z-index: 0;
     }
     main, header, section, footer, hr { position: relative; z-index: 1; }
+
+    /* Bottom presenter notes strip — always visible */
+    .canvas-notes-strip {
+      flex-shrink: 0;
+      height: 20%;
+      min-height: 140px;
+      max-height: 220px;
+      background: var(--chrome-bg-soft);
+      border-top: 1px solid var(--chrome-border);
+      padding: 14px 28px 18px;
+      overflow-y: auto;
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .notes-strip-label {
+      font-family: var(--font-ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--chrome-text-dim);
+      margin-bottom: 10px;
+      position: sticky;
+      top: -14px;
+      padding-top: 14px;
+      margin-top: -14px;
+      background: var(--chrome-bg-soft);
+      z-index: 1;
+    }
+    .notes-strip-content {
+      max-width: 660px;
+      margin: 0 auto;
+      color: var(--text-body);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .notes-strip-content p { margin-bottom: 2px; }
+    .notes-strip-content p.aside {
+      color: var(--text-dim);
+      font-style: italic;
+      font-family: var(--font-serif-italic);
+      font-size: 14px;
+      margin-left: 6px;
+    }
 
     /* Sidebar with preview thumbs */
     .sidebar-slide-thumb { position: relative; overflow: hidden; }
@@ -1080,7 +1068,7 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       opacity: 0;
       transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 50000;
+      z-index: 100001;
       pointer-events: none;
       white-space: nowrap;
     }
@@ -1647,16 +1635,9 @@
           <button class="find-close" id="findClose">×</button>
         </div>
 
-        <!-- Stage: always-visible current slide -->
-        <div class="canvas-stage">
-          <div class="stage-slide" id="stageSlide">
-            <div class="stage-hero">Where's<br>the deck?</div>
-          </div>
-        </div>
-
-        <!-- Notes: scrollable, contains all content -->
-        <div class="canvas-notes" id="canvasNotes">
-          <div class="notes-inner">
+        <!-- Scrolling content area -->
+        <div class="canvas-scroll" id="canvasScroll">
+          <div class="canvas-inner">
 
             <header class="site-header">
               <span class="pill header-pill"><span class="pill-dot"></span>in revision</span>
@@ -1700,6 +1681,17 @@
                   <span class="pill-dot"></span>new feedback received. progress adjusted.
                 </div>
               </div>
+
+              <section class="slide-section">
+                <div class="slide-section-header">
+                  <span class="label" style="margin-bottom:0">the deck so far</span>
+                  <span class="pill" id="slideSectionPill"><span class="pill-dot"></span>slide 2 of 3</span>
+                </div>
+                <div class="slide-frame">
+                  <span>Title goes here<span class="slide-cursor"></span></span>
+                </div>
+                <p class="slide-caption">three days of work, beautifully presented.</p>
+              </section>
             </main>
 
             <hr class="divider">
@@ -1719,32 +1711,29 @@
               <div class="faq-item"><p class="faq-q">Is the deck done?</p><p class="faq-a">[gestures at loading bar]</p></div>
             </section>
 
-            <hr class="divider">
-
-            <section class="speaker-notes">
-              <div class="speaker-notes-header">
-                <span class="label" style="margin-bottom:0">notes</span>
-              </div>
-              <div class="speaker-notes-content">
-                <p>Open with personal anecdote.</p>
-                <p>Make eye contact with three different audience members.</p>
-                <p>Click.</p>
-                <p>Read the slide aloud, word for word.</p>
-                <p>Pause for laughter.</p>
-                <p class="aside">(will not happen)</p>
-                <p>Click. Click. Click. Click.</p>
-                <p>Acknowledge each stakeholder by name.</p>
-                <p>Forget at least one stakeholder's name.</p>
-                <p>Recover gracefully.</p>
-                <p>Land the close.</p>
-                <p>Get out.</p>
-              </div>
-            </section>
-
             <footer>
               <p>wheresthedeck.com &mdash; a creative project management reality check</p>
             </footer>
 
+          </div>
+        </div>
+
+        <!-- Fixed presenter notes strip at bottom -->
+        <div class="canvas-notes-strip">
+          <div class="notes-strip-label">Presenter Notes</div>
+          <div class="notes-strip-content">
+            <p>Open with personal anecdote.</p>
+            <p>Make eye contact with three different audience members.</p>
+            <p>Click.</p>
+            <p>Read the slide aloud, word for word.</p>
+            <p>Pause for laughter.</p>
+            <p class="aside">(will not happen)</p>
+            <p>Click. Click. Click. Click.</p>
+            <p>Acknowledge each stakeholder by name.</p>
+            <p>Forget at least one stakeholder's name.</p>
+            <p>Recover gracefully.</p>
+            <p>Land the close.</p>
+            <p>Get out.</p>
           </div>
         </div>
       </div>
@@ -2023,8 +2012,8 @@
     /* Sidebar slides — with per-slide previews */
     const sidebarSlides = document.getElementById('sidebarSlides');
     const statusbarSlideCount = document.getElementById('statusbarSlideCount');
-    const canvasNotes = document.getElementById('canvasNotes');
-    const stageSlide = document.getElementById('stageSlide');
+    const slideSectionPill = document.getElementById('slideSectionPill');
+    const canvasScroll = document.getElementById('canvasScroll');
     let slideCount = 0;
     let activeSlide = 1;
 
@@ -2033,15 +2022,12 @@
       if (n === 3) return '<div class="thumb-content thumb-faq">FAQ</div>';
       return '<div class="thumb-content thumb-blank">Title</div>';
     }
-    function stageHTML(n) {
-      if (n === 1) return '<div class="stage-hero">Where\'s<br>the deck?</div>';
-      if (n === 3) return '<div class="stage-faq">Frequently<br>Asked Questions</div>';
-      return '<span class="stage-blank">Title goes here<span class="slide-cursor"></span></span>';
-    }
-    function renderStage(n) { stageSlide.innerHTML = stageHTML(n); }
 
     function updateSlideCounts() {
       statusbarSlideCount.textContent = `Slide ${activeSlide} of ${slideCount}`;
+      if (slideSectionPill) {
+        slideSectionPill.innerHTML = `<span class="pill-dot"></span>slide 2 of ${slideCount}`;
+      }
     }
     function updateSidebarSelection() {
       document.querySelectorAll('.sidebar-slide-row').forEach((row, i) => {
@@ -2052,7 +2038,6 @@
     function setActiveSlide(n) {
       if (n === activeSlide) return;
       activeSlide = n;
-      renderStage(n);
       updateSidebarSelection();
       updateSlideCounts();
     }
@@ -2071,11 +2056,11 @@
     }
     function selectViaClick(n) {
       setActiveSlide(n);
-      const targets = { 1: '.site-header', 3: '.faq' };
+      const targets = { 1: '.site-header', 2: '.slide-section', 3: '.faq' };
       const sel = targets[n];
       if (sel) {
-        const el = canvasNotes.querySelector(sel);
-        if (el) canvasNotes.scrollTo({ top: Math.max(0, el.offsetTop - 16), behavior: 'smooth' });
+        const el = canvasScroll.querySelector(sel);
+        if (el) canvasScroll.scrollTo({ top: Math.max(0, el.offsetTop - 16), behavior: 'smooth' });
       }
     }
     function triggerMagicMove() {
@@ -2087,17 +2072,19 @@
       });
     }
     for (let i = 0; i < 3; i++) addSlide(false);
-    renderStage(activeSlide);
 
-    /* Scroll-spy on the notes panel: hero → 1, FAQ → 3 */
+    /* Scroll-spy on the scrolling content: hero → 1, slide-section → 2, FAQ → 3 */
     function updateActiveFromScroll() {
-      const faqEl = canvasNotes.querySelector('.faq');
-      if (!faqEl) return;
-      const probe = canvasNotes.scrollTop + canvasNotes.clientHeight * 0.3;
-      if (probe >= faqEl.offsetTop) setActiveSlide(3);
-      else setActiveSlide(1);
+      const slideSectionEl = canvasScroll.querySelector('.slide-section');
+      const faqEl = canvasScroll.querySelector('.faq');
+      if (!slideSectionEl || !faqEl) return;
+      const probe = canvasScroll.scrollTop + canvasScroll.clientHeight * 0.28;
+      let active = 1;
+      if (probe >= slideSectionEl.offsetTop) active = 2;
+      if (probe >= faqEl.offsetTop) active = 3;
+      setActiveSlide(active);
     }
-    canvasNotes.addEventListener('scroll', updateActiveFromScroll, { passive: true });
+    canvasScroll.addEventListener('scroll', updateActiveFromScroll, { passive: true });
 
     document.getElementById('sidebarAdd').addEventListener('click', () => {
       addSlide(true);
