@@ -557,30 +557,152 @@
 
     .window-canvas {
       flex: 1;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       position: relative;
       background: var(--bg);
       transition: background 0.4s ease;
     }
-    .canvas-inner {
+    .canvas-stage {
+      flex-shrink: 0;
+      height: 40%;
+      min-height: 200px;
+      max-height: 400px;
+      background: var(--chrome-bg-soft);
+      border-bottom: 1px solid var(--chrome-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 24px;
+      position: relative;
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+    .stage-slide {
+      height: 100%;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #f5f5ee 0%, #e8e8df 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.08);
+      overflow: hidden;
+      padding: 28px;
+    }
+    .stage-hero {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 6.5vw, 4.4rem);
+      font-weight: normal;
+      letter-spacing: 0.01em;
+      line-height: 0.95;
+      background: linear-gradient(160deg, var(--green-bright) 0%, var(--green) 60%, var(--green-deep) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 14px var(--glow-bright));
+      text-align: center;
+    }
+    .stage-blank {
+      font-family: var(--font-ui);
+      color: #a8a89e;
+      font-size: clamp(1.4rem, 4.5vw, 2.4rem);
+      font-weight: 300;
+      letter-spacing: -0.018em;
+      display: inline-flex;
+      align-items: center;
+    }
+    .stage-faq {
+      font-family: var(--font-display);
+      color: #2a2a2a;
+      font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+      text-align: center;
+      letter-spacing: 0.005em;
+      line-height: 1.05;
+    }
+    .canvas-notes {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg);
+      position: relative;
+      transition: background 0.4s ease;
+    }
+    .notes-inner {
       max-width: 660px;
       margin: 0 auto;
-      padding: 64px 32px 80px;
+      padding: 36px 32px 80px;
       position: relative;
     }
-    .canvas-inner::before {
+    .notes-inner::before {
       content: '';
       position: absolute;
-      top: 20px;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 700px;
-      height: 500px;
+      height: 400px;
       background: radial-gradient(ellipse at center, var(--glow-soft) 0%, transparent 68%);
       pointer-events: none;
       z-index: 0;
     }
     main, header, section, footer, hr { position: relative; z-index: 1; }
+
+    /* Sidebar with preview thumbs */
+    .sidebar-slide-thumb { position: relative; overflow: hidden; }
+    .sidebar-slide-thumb:hover { box-shadow: 0 0 0 2px var(--green-dim); }
+    .sidebar-slide-thumb.selected:hover { box-shadow: 0 0 0 2px var(--green), 0 0 14px rgba(82, 201, 122, 0.35); }
+    .thumb-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 6px;
+      text-align: center;
+    }
+    .thumb-hero {
+      font-family: var(--font-display);
+      font-size: 8.5px;
+      line-height: 0.88;
+      background: linear-gradient(160deg, #90ffb8, #2a9e58);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.02em;
+    }
+    .thumb-blank {
+      font-family: var(--font-ui);
+      font-size: 6.5px;
+      color: #999990;
+      font-weight: 300;
+      justify-content: flex-start;
+      padding-left: 8px;
+    }
+    .thumb-faq {
+      font-family: var(--font-display);
+      font-size: 6.5px;
+      color: #3a3a3a;
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+
+    /* Speaker notes (inside notes panel) */
+    .speaker-notes { margin-top: 56px; }
+    .speaker-notes-header { margin-bottom: 18px; }
+    .speaker-notes-content {
+      font-family: var(--font-ui);
+      color: var(--green-dim);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .speaker-notes-content p { margin-bottom: 2px; }
+    .speaker-notes-content p.aside {
+      color: var(--text-dim);
+      font-style: italic;
+      font-family: var(--font-serif-italic);
+      font-size: 15px;
+      margin-left: 6px;
+    }
 
     /* ──────────────────────────────────────────────
        Comments pane (slides in from right)
@@ -1525,113 +1647,105 @@
           <button class="find-close" id="findClose">×</button>
         </div>
 
-        <div class="canvas-inner">
+        <!-- Stage: always-visible current slide -->
+        <div class="canvas-stage">
+          <div class="stage-slide" id="stageSlide">
+            <div class="stage-hero">Where's<br>the deck?</div>
+          </div>
+        </div>
 
-          <header class="site-header">
-            <span class="pill header-pill"><span class="pill-dot"></span>in revision</span>
-            <h1>Where's<br>the deck?</h1>
-            <p class="subtitle">it's almost ready.</p>
-          </header>
+        <!-- Notes: scrollable, contains all content -->
+        <div class="canvas-notes" id="canvasNotes">
+          <div class="notes-inner">
 
-          <main>
-            <div class="status-section">
-              <div class="label">current task</div>
-              <div class="status-message" id="statusMsg">
-                <span class="status-text in-place"><span class="cursor"></span></span>
-              </div>
-            </div>
-            <div class="progress-section">
-              <div class="progress-header">
-                <span class="progress-header-left">
-                  <span class="label" style="margin-bottom:0; min-height:0">completion</span>
-                  <span class="pill mono">build 47 of 47</span>
-                </span>
-                <span class="progress-pct" id="progressPct">—</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-              </div>
-              <div class="stats">
-                <div class="stat">
-                  <div class="stat-label">time since first request</div>
-                  <div class="stat-value mono" id="timeElapsed">—</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-label">revision rounds</div>
-                  <div class="stat-value" id="revisionCount">4</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-label">stakeholders</div>
-                  <div class="stat-value">too many</div>
+            <header class="site-header">
+              <span class="pill header-pill"><span class="pill-dot"></span>in revision</span>
+              <h1>Where's<br>the deck?</h1>
+              <p class="subtitle">it's almost ready.</p>
+            </header>
+
+            <main>
+              <div class="status-section">
+                <div class="label">current task</div>
+                <div class="status-message" id="statusMsg">
+                  <span class="status-text in-place"><span class="cursor"></span></span>
                 </div>
               </div>
-              <div class="feedback-alert" id="feedbackAlert">
-                <span class="pill-dot"></span>new feedback received. progress adjusted.
+              <div class="progress-section">
+                <div class="progress-header">
+                  <span class="progress-header-left">
+                    <span class="label" style="margin-bottom:0; min-height:0">completion</span>
+                    <span class="pill mono">build 47 of 47</span>
+                  </span>
+                  <span class="progress-pct" id="progressPct">—</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="stats">
+                  <div class="stat">
+                    <div class="stat-label">time since first request</div>
+                    <div class="stat-value mono" id="timeElapsed">—</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-label">revision rounds</div>
+                    <div class="stat-value" id="revisionCount">4</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-label">stakeholders</div>
+                    <div class="stat-value">too many</div>
+                  </div>
+                </div>
+                <div class="feedback-alert" id="feedbackAlert">
+                  <span class="pill-dot"></span>new feedback received. progress adjusted.
+                </div>
               </div>
-            </div>
+            </main>
 
-            <section class="slide-section">
-              <div class="slide-section-header">
-                <span class="label" style="margin-bottom:0">the deck so far</span>
-                <span class="pill" id="canvasSlideCount"><span class="pill-dot"></span>slide 1 of 1</span>
-              </div>
-              <div class="slide-frame">
-                <span>Title goes here<span class="slide-cursor"></span></span>
-              </div>
-              <p class="slide-caption">three days of work, beautifully presented.</p>
+            <hr class="divider">
+
+            <section class="faq">
+              <div class="faq-intro label">frequently asked questions</div>
+
+              <div class="faq-item"><p class="faq-q">When will the deck be ready?</p><p class="faq-a">When you stop asking.</p></div>
+              <div class="faq-item"><p class="faq-q">Can you just send what you have?</p><p class="faq-a">No.</p></div>
+              <div class="faq-item"><p class="faq-q">It's just a few slides, right?</p><p class="faq-a">Sure.</p></div>
+              <div class="faq-item"><p class="faq-q">How long does a deck actually take?</p><p class="faq-a">Longer than you think. Shorter than it deserves. Exactly long enough to make everyone involved quietly resentful.</p></div>
+              <div class="faq-item"><p class="faq-q">Can we do a quick sync about the deck?</p><p class="faq-a">The sync will take 45 minutes, produce three conflicting opinions, and result in a complete rethinking of the narrative arc. We'll schedule a follow-up to discuss the follow-up.</p></div>
+              <div class="faq-item"><p class="faq-q">I just sent some notes.</p><p class="faq-a">That's not a question. Also: noted. The progress bar has been updated accordingly.</p></div>
+              <div class="faq-item"><p class="faq-q">Can you make it more visual?</p><p class="faq-a">Can you make the content more visual?</p></div>
+              <div class="faq-item"><p class="faq-q">Can you add just one more thing?</p><p class="faq-a">Yes. [progress bar drops 4%]</p></div>
+              <div class="faq-item"><p class="faq-q">What's your timeline?</p><p class="faq-a">What's yours?</p></div>
+              <div class="faq-item"><p class="faq-q">Is the deck done?</p><p class="faq-a">[gestures at loading bar]</p></div>
             </section>
-          </main>
 
-          <hr class="divider">
+            <hr class="divider">
 
-          <section class="faq">
-            <div class="faq-intro label">frequently asked questions</div>
-
-            <div class="faq-item"><p class="faq-q">When will the deck be ready?</p><p class="faq-a">When you stop asking.</p></div>
-            <div class="faq-item"><p class="faq-q">Can you just send what you have?</p><p class="faq-a">No.</p></div>
-            <div class="faq-item"><p class="faq-q">It's just a few slides, right?</p><p class="faq-a">Sure.</p></div>
-            <div class="faq-item"><p class="faq-q">How long does a deck actually take?</p><p class="faq-a">Longer than you think. Shorter than it deserves. Exactly long enough to make everyone involved quietly resentful.</p></div>
-            <div class="faq-item"><p class="faq-q">Can we do a quick sync about the deck?</p><p class="faq-a">The sync will take 45 minutes, produce three conflicting opinions, and result in a complete rethinking of the narrative arc. We'll schedule a follow-up to discuss the follow-up.</p></div>
-            <div class="faq-item"><p class="faq-q">I just sent some notes.</p><p class="faq-a">That's not a question. Also: noted. The progress bar has been updated accordingly.</p></div>
-            <div class="faq-item"><p class="faq-q">Can you make it more visual?</p><p class="faq-a">Can you make the content more visual?</p></div>
-            <div class="faq-item"><p class="faq-q">Can you add just one more thing?</p><p class="faq-a">Yes. [progress bar drops 4%]</p></div>
-            <div class="faq-item"><p class="faq-q">What's your timeline?</p><p class="faq-a">What's yours?</p></div>
-            <div class="faq-item"><p class="faq-q">Is the deck done?</p><p class="faq-a">[gestures at loading bar]</p></div>
-          </section>
-
-          <section class="presenter-view">
-            <div class="presenter-view-header">
-              <span class="label" style="margin-bottom:0">presenter view</span>
-              <span class="pill"><span class="pill-dot"></span>final draft</span>
-            </div>
-            <div class="presenter-view-frame">
-              <div class="presenter-view-slide">
-                <span>Title goes here<span class="slide-cursor"></span></span>
+            <section class="speaker-notes">
+              <div class="speaker-notes-header">
+                <span class="label" style="margin-bottom:0">notes</span>
               </div>
-              <div class="presenter-view-notes">
-                <div class="presenter-view-notes-label">Presenter Notes</div>
-                <div class="presenter-view-content">
-                  <p>Open with personal anecdote.</p>
-                  <p>Make eye contact with three different audience members.</p>
-                  <p>Click.</p>
-                  <p>Read the slide aloud, word for word.</p>
-                  <p>Pause for laughter.</p>
-                  <p class="aside">(will not happen)</p>
-                  <p>Click. Click. Click. Click.</p>
-                  <p>Acknowledge each stakeholder by name.</p>
-                  <p>Forget at least one stakeholder's name.</p>
-                  <p>Recover gracefully.</p>
-                  <p>Land the close.</p>
-                  <p>Get out.</p>
-                </div>
+              <div class="speaker-notes-content">
+                <p>Open with personal anecdote.</p>
+                <p>Make eye contact with three different audience members.</p>
+                <p>Click.</p>
+                <p>Read the slide aloud, word for word.</p>
+                <p>Pause for laughter.</p>
+                <p class="aside">(will not happen)</p>
+                <p>Click. Click. Click. Click.</p>
+                <p>Acknowledge each stakeholder by name.</p>
+                <p>Forget at least one stakeholder's name.</p>
+                <p>Recover gracefully.</p>
+                <p>Land the close.</p>
+                <p>Get out.</p>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <footer>
-            <p>wheresthedeck.com &mdash; a creative project management reality check</p>
-          </footer>
+            <footer>
+              <p>wheresthedeck.com &mdash; a creative project management reality check</p>
+            </footer>
 
+          </div>
         </div>
       </div>
 
@@ -1906,34 +2020,63 @@
       });
     }
 
-    /* Sidebar slides */
+    /* Sidebar slides — with per-slide previews */
     const sidebarSlides = document.getElementById('sidebarSlides');
-    const canvasSlideCount = document.getElementById('canvasSlideCount');
     const statusbarSlideCount = document.getElementById('statusbarSlideCount');
+    const canvasNotes = document.getElementById('canvasNotes');
+    const stageSlide = document.getElementById('stageSlide');
     let slideCount = 0;
-
     let activeSlide = 1;
+
+    function thumbHTML(n) {
+      if (n === 1) return '<div class="thumb-content thumb-hero">Where\'s<br>the deck?</div>';
+      if (n === 3) return '<div class="thumb-content thumb-faq">FAQ</div>';
+      return '<div class="thumb-content thumb-blank">Title</div>';
+    }
+    function stageHTML(n) {
+      if (n === 1) return '<div class="stage-hero">Where\'s<br>the deck?</div>';
+      if (n === 3) return '<div class="stage-faq">Frequently<br>Asked Questions</div>';
+      return '<span class="stage-blank">Title goes here<span class="slide-cursor"></span></span>';
+    }
+    function renderStage(n) { stageSlide.innerHTML = stageHTML(n); }
+
     function updateSlideCounts() {
-      canvasSlideCount.innerHTML = `<span class="pill-dot"></span>slide 2 of ${slideCount}`;
       statusbarSlideCount.textContent = `Slide ${activeSlide} of ${slideCount}`;
+    }
+    function updateSidebarSelection() {
+      document.querySelectorAll('.sidebar-slide-row').forEach((row, i) => {
+        const thumb = row.querySelector('.sidebar-slide-thumb');
+        if (thumb) thumb.classList.toggle('selected', i + 1 === activeSlide);
+      });
     }
     function setActiveSlide(n) {
       if (n === activeSlide) return;
       activeSlide = n;
-      document.querySelectorAll('.sidebar-slide-thumb').forEach((thumb, i) => {
-        thumb.classList.toggle('selected', i + 1 === activeSlide);
-      });
-      statusbarSlideCount.textContent = `Slide ${activeSlide} of ${slideCount}`;
+      renderStage(n);
+      updateSidebarSelection();
+      updateSlideCounts();
     }
     function addSlide(animate = true) {
       slideCount++;
+      const num = slideCount;
       const row = document.createElement('div');
       row.className = 'sidebar-slide-row' + (animate ? ' magic-in' : '');
-      row.innerHTML = `<span class="sidebar-slide-num">${slideCount}</span>
-                       <div class="sidebar-slide-thumb${slideCount === 1 ? ' selected' : ''}"></div>`;
+      row.innerHTML =
+        `<span class="sidebar-slide-num">${num}</span>
+         <div class="sidebar-slide-thumb${num === activeSlide ? ' selected' : ''}" data-slide="${num}">${thumbHTML(num)}</div>`;
       sidebarSlides.appendChild(row);
+      row.querySelector('.sidebar-slide-thumb').addEventListener('click', () => selectViaClick(num));
       if (animate) setTimeout(() => row.classList.remove('magic-in'), 700);
       updateSlideCounts();
+    }
+    function selectViaClick(n) {
+      setActiveSlide(n);
+      const targets = { 1: '.site-header', 3: '.faq' };
+      const sel = targets[n];
+      if (sel) {
+        const el = canvasNotes.querySelector(sel);
+        if (el) canvasNotes.scrollTo({ top: Math.max(0, el.offsetTop - 16), behavior: 'smooth' });
+      }
     }
     function triggerMagicMove() {
       document.querySelectorAll('.sidebar-slide-row').forEach(r => {
@@ -1944,20 +2087,17 @@
       });
     }
     for (let i = 0; i < 3; i++) addSlide(false);
+    renderStage(activeSlide);
 
-    /* Scroll-spy: section → slide mapping (1=hero+progress, 2=deck preview, 3=FAQ) */
+    /* Scroll-spy on the notes panel: hero → 1, FAQ → 3 */
     function updateActiveFromScroll() {
-      const slideEl = document.querySelector('.slide-section');
-      const faqEl   = document.querySelector('.faq');
-      if (!slideEl || !faqEl) return;
-      const probe = canvas.scrollTop + canvas.clientHeight * 0.28;
-      let active = 1;
-      if (probe >= slideEl.offsetTop) active = 2;
-      if (probe >= faqEl.offsetTop)   active = 3;
-      setActiveSlide(active);
+      const faqEl = canvasNotes.querySelector('.faq');
+      if (!faqEl) return;
+      const probe = canvasNotes.scrollTop + canvasNotes.clientHeight * 0.3;
+      if (probe >= faqEl.offsetTop) setActiveSlide(3);
+      else setActiveSlide(1);
     }
-    canvas.addEventListener('scroll', updateActiveFromScroll, { passive: true });
-    setTimeout(updateActiveFromScroll, 100);
+    canvasNotes.addEventListener('scroll', updateActiveFromScroll, { passive: true });
 
     document.getElementById('sidebarAdd').addEventListener('click', () => {
       addSlide(true);
