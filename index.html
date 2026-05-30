@@ -18,21 +18,300 @@
       --green-track: #081a0e;
       --red: #e05555;
       --text-dim: #1e4028;
+
+      --chrome-bg: #1a1a1a;
+      --chrome-bg-soft: #161616;
+      --chrome-border: #2a2a2a;
+      --chrome-border-soft: #1f1f1f;
+      --chrome-text: #c4c4c4;
+      --chrome-text-dim: #888;
     }
+    html, body { height: 100%; }
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(82, 201, 122, 0.04), transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(82, 201, 122, 0.03), transparent 60%),
+        #060606;
       color: var(--green);
       font-family: 'Courier New', Courier, monospace;
-      min-height: 100vh;
-      padding: 64px 24px 80px;
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    /* ──────────────────────────────────────────────
+       macOS-style menu bar (top of viewport)
+       ────────────────────────────────────────────── */
+    .macos-menubar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 26px;
+      background: rgba(22, 22, 22, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      z-index: 100;
+      user-select: none;
+    }
+    .mb-app {
+      font-weight: 700;
+      color: #e8e8e8;
+      margin-right: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mb-app::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+    .mb-item {
+      color: #c4c4c4;
+      padding: 2px 10px;
+      border-radius: 4px;
+      cursor: default;
+      transition: background 0.12s ease;
+    }
+    .mb-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .mb-right {
+      margin-left: auto;
+      color: #999;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+    }
+    .mb-saving {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mb-saving-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    /* ──────────────────────────────────────────────
+       Window
+       ────────────────────────────────────────────── */
+    .window {
+      position: fixed;
+      top: 44px;
+      left: 28px;
+      right: 28px;
+      bottom: 20px;
+      background: var(--bg);
+      border-radius: 10px;
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 0 0 0.5px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .window-titlebar {
+      height: 38px;
+      background: linear-gradient(to bottom, #1d1d1d, #161616);
+      border-bottom: 1px solid #232323;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+    }
+    .tl {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 0.5px solid rgba(0, 0, 0, 0.25);
+      box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+      transition: filter 0.15s ease;
+    }
+    .tl:hover { filter: brightness(1.15); }
+    .tl-close { background: #ff5f57; }
+    .tl-min   { background: #febc2e; }
+    .tl-max   { background: #28c840; }
+    .window-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: #b8b8b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+      letter-spacing: 0.02em;
+    }
+    .window-title .dim-suffix { color: #707070; font-style: italic; }
+
+    /* ──────────────────────────────────────────────
+       Toolbar
+       ────────────────────────────────────────────── */
+    .window-toolbar {
+      height: 52px;
+      background: #161616;
+      border-bottom: 1px solid #232323;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 4px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .tb-btn {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-width: 52px;
+      height: 38px;
+      padding: 0 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #b0b0b0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      cursor: default;
+      transition: background 0.12s ease, border-color 0.12s ease;
+      user-select: none;
+    }
+    .tb-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e8e8e8;
+    }
+    .tb-icon {
+      font-size: 15px;
+      line-height: 1;
+      color: #c8c8c8;
+    }
+    .tb-divider {
+      width: 1px;
+      height: 24px;
+      background: #2a2a2a;
+      margin: 0 6px;
+    }
+
+    /* ──────────────────────────────────────────────
+       Body: sidebar + canvas
+       ────────────────────────────────────────────── */
+    .window-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .window-sidebar {
+      width: 150px;
+      background: #0c0c0c;
+      border-right: 1px solid #1c1c1c;
+      padding: 16px 12px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidebar-header {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #555;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+    .sidebar-slide-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+    .sidebar-slide-num {
+      color: var(--green-dim);
+      font-size: 10px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      width: 12px;
+      text-align: right;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .sidebar-slide-thumb {
+      flex: 1;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #f5f5ee 0%, #e8e8df 100%);
+      border-radius: 3px;
+      cursor: default;
+      transition: box-shadow 0.15s ease;
+    }
+    .sidebar-slide-thumb.selected {
+      box-shadow: 0 0 0 2px var(--green), 0 0 14px rgba(82, 201, 122, 0.4);
+    }
+    .sidebar-add {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      border: 1px dashed #1f1f1f;
+      border-radius: 4px;
+      color: #444;
+      cursor: default;
+      font-size: 14px;
+      font-family: inherit;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      margin-top: 6px;
+    }
+    .sidebar-add:hover {
+      color: var(--green-dim);
+      border-color: #2a3d2e;
+    }
+    .sidebar-add.shake {
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(2px); }
+    }
+
+    .window-canvas {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+      background: var(--bg);
+    }
+    .canvas-inner {
       max-width: 660px;
       margin: 0 auto;
-      line-height: 1.6;
+      padding: 64px 32px 80px;
+      position: relative;
     }
-    body::before {
+    .canvas-inner::before {
       content: '';
-      position: fixed;
-      top: -10%;
+      position: absolute;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: 700px;
@@ -42,6 +321,90 @@
       z-index: 0;
     }
     main, header, section, footer, hr { position: relative; z-index: 1; }
+
+    /* ──────────────────────────────────────────────
+       Status bar
+       ────────────────────────────────────────────── */
+    .window-statusbar {
+      height: 26px;
+      background: linear-gradient(to bottom, #141414, #101010);
+      border-top: 1px solid #1f1f1f;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      color: #6a6a6a;
+      flex-shrink: 0;
+    }
+    .sb-divider { color: #333; }
+    .sb-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-zoom {
+      color: #888;
+      cursor: default;
+    }
+
+    /* ──────────────────────────────────────────────
+       Beachball cursor
+       ────────────────────────────────────────────── */
+    .beachball {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      top: 0;
+      left: 0;
+    }
+    .beachball.active { opacity: 1; }
+    .beachball-wheel {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #ff3b30 0%,
+        #ff9500 14%,
+        #ffcc00 28%,
+        #34c759 42%,
+        #00c7be 56%,
+        #007aff 70%,
+        #af52de 84%,
+        #ff3b30 100%
+      );
+      animation: bb-spin 1.4s linear infinite;
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 0 0 6px rgba(255, 255, 255, 0.06);
+      position: relative;
+    }
+    .beachball-wheel::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+    }
+    @keyframes bb-spin {
+      to { transform: rotate(360deg); }
+    }
+    .canvas-cursor-none, .canvas-cursor-none * { cursor: none !important; }
+
+    /* ──────────────────────────────────────────────
+       Existing content styles (preserved)
+       ────────────────────────────────────────────── */
     .site-header { margin-bottom: 64px; }
     h1 {
       font-family: 'Abril Fatface', Georgia, serif;
@@ -242,135 +605,240 @@
     }
     .press-space.activated { color: var(--green); }
     .press-space.activated kbd { color: var(--green-bright); border-color: rgba(82, 201, 122, 0.5); }
+
+    /* ──────────────────────────────────────────────
+       Mobile fallback — hide chrome, restore page
+       ────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .macos-menubar { display: none; }
+      .window {
+        position: static;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 0;
+        box-shadow: none;
+        height: auto;
+        background: transparent;
+      }
+      .window-titlebar, .window-toolbar, .window-statusbar { display: none; }
+      .window-sidebar { display: none; }
+      .window-body { display: block; overflow: visible; }
+      .window-canvas { overflow: visible; }
+      .canvas-inner { padding: 48px 20px 64px; }
+      .beachball { display: none !important; }
+    }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <span class="pill header-pill"><span class="pill-dot"></span>in revision</span>
-    <h1>Where's<br>the deck?</h1>
-    <p class="subtitle">it's almost ready.</p>
-  </header>
 
-  <main>
-    <div class="status-section">
-      <div class="label">current task</div>
-      <div class="status-message" id="statusMsg"><span class="cursor">_</span></div>
+  <!-- Beachball cursor -->
+  <div class="beachball" id="beachball" aria-hidden="true">
+    <div class="beachball-wheel"></div>
+  </div>
+
+  <!-- macOS-style menu bar -->
+  <div class="macos-menubar">
+    <span class="mb-app">wheresthedeck</span>
+    <span class="mb-item">File</span>
+    <span class="mb-item">Edit</span>
+    <span class="mb-item">Insert</span>
+    <span class="mb-item">Slide</span>
+    <span class="mb-item">Format</span>
+    <span class="mb-item">Arrange</span>
+    <span class="mb-item">View</span>
+    <span class="mb-item">Play</span>
+    <span class="mb-item">Window</span>
+    <span class="mb-item">Help</span>
+    <span class="mb-right">
+      <span class="mb-saving"><span class="mb-saving-dot"></span>saving…</span>
+    </span>
+  </div>
+
+  <!-- App window -->
+  <div class="window">
+
+    <!-- Title bar -->
+    <div class="window-titlebar">
+      <div class="traffic-lights">
+        <span class="tl tl-close" title="close"></span>
+        <span class="tl tl-min" title="minimize"></span>
+        <span class="tl tl-max" title="maximize"></span>
+      </div>
+      <div class="window-title">where's-the-deck_v47_FINAL_USE_THIS.key <span class="dim-suffix">— Edited</span></div>
     </div>
-    <div class="progress-section">
-      <div class="progress-header">
-        <span class="progress-header-left">
-          <span class="label" style="margin-bottom:0; min-height:0">completion</span>
-          <span class="pill">build 47 of 47</span>
-        </span>
-        <span class="progress-pct" id="progressPct">—</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-      </div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">time since first request</div>
-          <div class="stat-value" id="timeElapsed">—</div>
+
+    <!-- Toolbar -->
+    <div class="window-toolbar">
+      <button class="tb-btn" title="Play"><span class="tb-icon">▶</span>Play</button>
+      <span class="tb-divider"></span>
+      <button class="tb-btn" title="Add Slide"><span class="tb-icon">＋</span>Slide</button>
+      <button class="tb-btn" title="Text"><span class="tb-icon">T</span>Text</button>
+      <button class="tb-btn" title="Shape"><span class="tb-icon">○</span>Shape</button>
+      <button class="tb-btn" title="Media"><span class="tb-icon">▭</span>Media</button>
+      <span class="tb-divider"></span>
+      <button class="tb-btn" title="Format"><span class="tb-icon">A</span>Format</button>
+      <button class="tb-btn" title="Animate"><span class="tb-icon">⇆</span>Animate</button>
+      <button class="tb-btn" title="Inspector"><span class="tb-icon">ⓘ</span>Inspect</button>
+    </div>
+
+    <!-- Window body: sidebar + canvas -->
+    <div class="window-body">
+      <aside class="window-sidebar" id="sidebar">
+        <div class="sidebar-header">Slides</div>
+        <div class="sidebar-slide-row">
+          <span class="sidebar-slide-num">1</span>
+          <div class="sidebar-slide-thumb selected"></div>
         </div>
-        <div class="stat">
-          <div class="stat-label">revision rounds</div>
-          <div class="stat-value" id="revisionCount">4</div>
+        <button class="sidebar-add" id="sidebarAdd" title="Add Slide">+</button>
+      </aside>
+
+      <div class="window-canvas" id="windowCanvas">
+        <div class="canvas-inner">
+
+          <header class="site-header">
+            <span class="pill header-pill"><span class="pill-dot"></span>in revision</span>
+            <h1>Where's<br>the deck?</h1>
+            <p class="subtitle">it's almost ready.</p>
+          </header>
+
+          <main>
+            <div class="status-section">
+              <div class="label">current task</div>
+              <div class="status-message" id="statusMsg"><span class="cursor">_</span></div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-header">
+                <span class="progress-header-left">
+                  <span class="label" style="margin-bottom:0; min-height:0">completion</span>
+                  <span class="pill">build 47 of 47</span>
+                </span>
+                <span class="progress-pct" id="progressPct">—</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <div class="stat-label">time since first request</div>
+                  <div class="stat-value" id="timeElapsed">—</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">revision rounds</div>
+                  <div class="stat-value" id="revisionCount">4</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">stakeholders</div>
+                  <div class="stat-value">too many</div>
+                </div>
+              </div>
+              <div class="feedback-alert" id="feedbackAlert">
+                <span class="pill-dot"></span>new feedback received. progress adjusted.
+              </div>
+            </div>
+
+            <section class="slide-section">
+              <div class="slide-section-header">
+                <span class="label" style="margin-bottom:0">the deck so far</span>
+                <span class="pill"><span class="pill-dot"></span>slide 1 of 1</span>
+              </div>
+              <div class="slide-frame">
+                <span>Title goes here<span class="slide-cursor"></span></span>
+              </div>
+              <p class="slide-caption">three days of work, beautifully presented.</p>
+            </section>
+          </main>
+
+          <hr class="divider">
+
+          <section class="faq">
+            <div class="faq-intro label">frequently asked questions</div>
+
+            <div class="faq-item">
+              <p class="faq-q">When will the deck be ready?</p>
+              <p class="faq-a">When you stop asking.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">Can you just send what you have?</p>
+              <p class="faq-a">No.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">It's just a few slides, right?</p>
+              <p class="faq-a">Sure.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">How long does a deck actually take?</p>
+              <p class="faq-a">Longer than you think. Shorter than it deserves. Exactly long enough to make everyone involved quietly resentful.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">Can we do a quick sync about the deck?</p>
+              <p class="faq-a">The sync will take 45 minutes, produce three conflicting opinions, and result in a complete rethinking of the narrative arc. We'll schedule a follow-up to discuss the follow-up.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">I just sent some notes.</p>
+              <p class="faq-a">That's not a question. Also: noted. The progress bar has been updated accordingly.</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">Can you make it more visual?</p>
+              <p class="faq-a">Can you make the content more visual?</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">Can you add just one more thing?</p>
+              <p class="faq-a">Yes. [progress bar drops 4%]</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">What's your timeline?</p>
+              <p class="faq-a">What's yours?</p>
+            </div>
+            <div class="faq-item">
+              <p class="faq-q">Is the deck done?</p>
+              <p class="faq-a">[gestures at loading bar]</p>
+            </div>
+          </section>
+
+          <section class="presenter-notes">
+            <div class="presenter-notes-header">
+              <span class="label" style="margin-bottom:0">presenter notes</span>
+              <span class="pill"><span class="pill-dot"></span>final draft</span>
+            </div>
+            <div class="presenter-notes-content">
+              <p>Open with personal anecdote.</p>
+              <p>Make eye contact with three different audience members.</p>
+              <p>Click.</p>
+              <p>Read the slide aloud, word for word.</p>
+              <p>Pause for laughter.</p>
+              <p class="aside">(will not happen)</p>
+              <p>Click. Click. Click. Click.</p>
+              <p>Acknowledge each stakeholder by name.</p>
+              <p>Forget at least one stakeholder's name.</p>
+              <p>Recover gracefully.</p>
+              <p>Land the close.</p>
+              <p>Get out.</p>
+            </div>
+          </section>
+
+          <p class="press-space" id="pressSpace">press <kbd>space</kbd> to advance</p>
+
+          <footer>
+            <p>wheresthedeck.com &mdash; a creative project management reality check</p>
+          </footer>
+
         </div>
-        <div class="stat">
-          <div class="stat-label">stakeholders</div>
-          <div class="stat-value">too many</div>
-        </div>
-      </div>
-      <div class="feedback-alert" id="feedbackAlert">
-        <span class="pill-dot"></span>new feedback received. progress adjusted.
       </div>
     </div>
 
-    <section class="slide-section">
-      <div class="slide-section-header">
-        <span class="label" style="margin-bottom:0">the deck so far</span>
-        <span class="pill"><span class="pill-dot"></span>slide 1 of 1</span>
-      </div>
-      <div class="slide-frame">
-        <span>Title goes here<span class="slide-cursor"></span></span>
-      </div>
-      <p class="slide-caption">three days of work, beautifully presented.</p>
-    </section>
-  </main>
+    <!-- Status bar -->
+    <div class="window-statusbar">
+      <span>Slide 1 of 1</span>
+      <span class="sb-divider">·</span>
+      <span>Edited</span>
+      <span class="sb-divider">·</span>
+      <span>Last autosaved 3 days ago</span>
+      <span class="sb-right">
+        <span class="sb-zoom">100%</span>
+      </span>
+    </div>
 
-  <hr class="divider">
-
-  <section class="faq">
-    <div class="faq-intro label">frequently asked questions</div>
-
-    <div class="faq-item">
-      <p class="faq-q">When will the deck be ready?</p>
-      <p class="faq-a">When you stop asking.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">Can you just send what you have?</p>
-      <p class="faq-a">No.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">It's just a few slides, right?</p>
-      <p class="faq-a">Sure.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">How long does a deck actually take?</p>
-      <p class="faq-a">Longer than you think. Shorter than it deserves. Exactly long enough to make everyone involved quietly resentful.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">Can we do a quick sync about the deck?</p>
-      <p class="faq-a">The sync will take 45 minutes, produce three conflicting opinions, and result in a complete rethinking of the narrative arc. We'll schedule a follow-up to discuss the follow-up.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">I just sent some notes.</p>
-      <p class="faq-a">That's not a question. Also: noted. The progress bar has been updated accordingly.</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">Can you make it more visual?</p>
-      <p class="faq-a">Can you make the content more visual?</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">Can you add just one more thing?</p>
-      <p class="faq-a">Yes. [progress bar drops 4%]</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">What's your timeline?</p>
-      <p class="faq-a">What's yours?</p>
-    </div>
-    <div class="faq-item">
-      <p class="faq-q">Is the deck done?</p>
-      <p class="faq-a">[gestures at loading bar]</p>
-    </div>
-  </section>
-
-  <section class="presenter-notes">
-    <div class="presenter-notes-header">
-      <span class="label" style="margin-bottom:0">presenter notes</span>
-      <span class="pill"><span class="pill-dot"></span>final draft</span>
-    </div>
-    <div class="presenter-notes-content">
-      <p>Open with personal anecdote.</p>
-      <p>Make eye contact with three different audience members.</p>
-      <p>Click.</p>
-      <p>Read the slide aloud, word for word.</p>
-      <p>Pause for laughter.</p>
-      <p class="aside">(will not happen)</p>
-      <p>Click. Click. Click. Click.</p>
-      <p>Acknowledge each stakeholder by name.</p>
-      <p>Forget at least one stakeholder's name.</p>
-      <p>Recover gracefully.</p>
-      <p>Land the close.</p>
-      <p>Get out.</p>
-    </div>
-  </section>
-
-  <p class="press-space" id="pressSpace">press <kbd>space</kbd> to advance</p>
-
-  <footer>
-    <p>wheresthedeck.com &mdash; a creative project management reality check</p>
-  </footer>
+  </div>
 
   <script>
     const statuses = [
@@ -517,6 +985,40 @@
     setTimeout(rotateStatus, 5000 + Math.random() * 1500);
     setTimeout(creep, 1500);
     setTimeout(feedbackEvent, 22000 + Math.random() * 38000);
+
+    // ──────────────────────────────────────────────
+    // Beachball cursor — activates over the canvas
+    // ──────────────────────────────────────────────
+    const beachball = document.getElementById('beachball');
+    const canvas    = document.getElementById('windowCanvas');
+
+    if (beachball && canvas) {
+      document.addEventListener('mousemove', (e) => {
+        beachball.style.left = e.clientX + 'px';
+        beachball.style.top  = e.clientY + 'px';
+      });
+      canvas.addEventListener('mouseenter', () => {
+        beachball.classList.add('active');
+        canvas.classList.add('canvas-cursor-none');
+      });
+      canvas.addEventListener('mouseleave', () => {
+        beachball.classList.remove('active');
+        canvas.classList.remove('canvas-cursor-none');
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    // "+" Add Slide button — shakes, does nothing
+    // ──────────────────────────────────────────────
+    const sidebarAdd = document.getElementById('sidebarAdd');
+    if (sidebarAdd) {
+      sidebarAdd.addEventListener('click', () => {
+        sidebarAdd.classList.remove('shake');
+        // Trigger reflow to restart animation
+        void sidebarAdd.offsetWidth;
+        sidebarAdd.classList.add('shake');
+      });
+    }
   </script>
 </body>
 </html>
