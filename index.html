@@ -805,13 +805,16 @@
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 18px;
       font-family: var(--font-display);
-      font-size: 64px;
-      color: rgba(0,0,0,0.32);
-      line-height: 0.85;
-      padding-top: 10px;
+      font-size: 58px;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1;
       box-shadow:
         0 10px 24px rgba(82, 201, 122, 0.3),
         inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .about-icon span {
+      display: block;
+      transform: translateY(-3px);
     }
     .about-title {
       font-family: var(--font-ui);
@@ -1141,26 +1144,52 @@
       margin-top: 16px;
     }
 
-    .presenter-notes {
-      margin-top: 64px;
-      padding: 30px 30px 34px;
-      border: 1px solid var(--presenter-border);
-      border-radius: 10px;
-      background: var(--presenter-bg);
-    }
-    .presenter-notes-header {
+    .presenter-view { margin-top: 64px; }
+    .presenter-view-header {
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 14px;
     }
-    .presenter-notes-content {
+    .presenter-view-frame {
+      background: #0a0a0a;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow:
+        0 14px 44px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .presenter-view-slide {
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #f5f5ee 0%, #e8e8df 100%);
+      display: flex; align-items: center; justify-content: center;
       font-family: var(--font-ui);
-      color: var(--green-dim);
-      font-size: 14px;
-      line-height: 1.8;
+      color: #a8a89e;
+      font-size: clamp(1.2rem, 3.8vw, 2rem);
+      font-weight: 300;
+      letter-spacing: -0.018em;
+      border-bottom: 1px solid rgba(0,0,0,0.4);
     }
-    .presenter-notes-content p { margin-bottom: 2px; }
-    .presenter-notes-content p.aside {
-      color: var(--text-dim);
+    .presenter-view-notes {
+      background: #0c0c0c;
+      padding: 22px 28px 28px;
+    }
+    .presenter-view-notes-label {
+      font-family: var(--font-ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #5a6a60;
+      margin-bottom: 14px;
+    }
+    .presenter-view-content {
+      color: #b8c8be;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .presenter-view-content p { margin-bottom: 2px; }
+    .presenter-view-content p.aside {
+      color: #6a7a70;
       font-style: italic;
       font-family: var(--font-serif-italic);
       font-size: 15px;
@@ -1570,28 +1599,34 @@
             <div class="faq-item"><p class="faq-q">Is the deck done?</p><p class="faq-a">[gestures at loading bar]</p></div>
           </section>
 
-          <section class="presenter-notes">
-            <div class="presenter-notes-header">
-              <span class="label" style="margin-bottom:0">presenter notes</span>
+          <section class="presenter-view">
+            <div class="presenter-view-header">
+              <span class="label" style="margin-bottom:0">presenter view</span>
               <span class="pill"><span class="pill-dot"></span>final draft</span>
             </div>
-            <div class="presenter-notes-content">
-              <p>Open with personal anecdote.</p>
-              <p>Make eye contact with three different audience members.</p>
-              <p>Click.</p>
-              <p>Read the slide aloud, word for word.</p>
-              <p>Pause for laughter.</p>
-              <p class="aside">(will not happen)</p>
-              <p>Click. Click. Click. Click.</p>
-              <p>Acknowledge each stakeholder by name.</p>
-              <p>Forget at least one stakeholder's name.</p>
-              <p>Recover gracefully.</p>
-              <p>Land the close.</p>
-              <p>Get out.</p>
+            <div class="presenter-view-frame">
+              <div class="presenter-view-slide">
+                <span>Title goes here<span class="slide-cursor"></span></span>
+              </div>
+              <div class="presenter-view-notes">
+                <div class="presenter-view-notes-label">Presenter Notes</div>
+                <div class="presenter-view-content">
+                  <p>Open with personal anecdote.</p>
+                  <p>Make eye contact with three different audience members.</p>
+                  <p>Click.</p>
+                  <p>Read the slide aloud, word for word.</p>
+                  <p>Pause for laughter.</p>
+                  <p class="aside">(will not happen)</p>
+                  <p>Click. Click. Click. Click.</p>
+                  <p>Acknowledge each stakeholder by name.</p>
+                  <p>Forget at least one stakeholder's name.</p>
+                  <p>Recover gracefully.</p>
+                  <p>Land the close.</p>
+                  <p>Get out.</p>
+                </div>
+              </div>
             </div>
           </section>
-
-          <p class="press-space" id="pressSpace">press <kbd>space</kbd> to advance</p>
 
           <footer>
             <p>wheresthedeck.com &mdash; a creative project management reality check</p>
@@ -1637,7 +1672,7 @@
   <div class="about-dialog" id="aboutDialog" aria-hidden="true">
     <div class="about-backdrop" id="aboutBackdrop"></div>
     <div class="about-card">
-      <div class="about-icon">?</div>
+      <div class="about-icon"><span>?</span></div>
       <h2 class="about-title">wheresthedeck</h2>
       <p class="about-version">Version 47.12.3 — almost ready</p>
       <p class="about-build">Build 47 of 47 (in progress)</p>
@@ -1877,9 +1912,18 @@
     const statusbarSlideCount = document.getElementById('statusbarSlideCount');
     let slideCount = 0;
 
+    let activeSlide = 1;
     function updateSlideCounts() {
-      canvasSlideCount.innerHTML = `<span class="pill-dot"></span>slide 1 of ${slideCount}`;
-      statusbarSlideCount.textContent = `Slide 1 of ${slideCount}`;
+      canvasSlideCount.innerHTML = `<span class="pill-dot"></span>slide 2 of ${slideCount}`;
+      statusbarSlideCount.textContent = `Slide ${activeSlide} of ${slideCount}`;
+    }
+    function setActiveSlide(n) {
+      if (n === activeSlide) return;
+      activeSlide = n;
+      document.querySelectorAll('.sidebar-slide-thumb').forEach((thumb, i) => {
+        thumb.classList.toggle('selected', i + 1 === activeSlide);
+      });
+      statusbarSlideCount.textContent = `Slide ${activeSlide} of ${slideCount}`;
     }
     function addSlide(animate = true) {
       slideCount++;
@@ -1899,7 +1943,21 @@
         setTimeout(() => r.classList.remove('magic-in'), 700);
       });
     }
-    for (let i = 0; i < 4; i++) addSlide(false);
+    for (let i = 0; i < 3; i++) addSlide(false);
+
+    /* Scroll-spy: section → slide mapping (1=hero+progress, 2=deck preview, 3=FAQ) */
+    function updateActiveFromScroll() {
+      const slideEl = document.querySelector('.slide-section');
+      const faqEl   = document.querySelector('.faq');
+      if (!slideEl || !faqEl) return;
+      const probe = canvas.scrollTop + canvas.clientHeight * 0.28;
+      let active = 1;
+      if (probe >= slideEl.offsetTop) active = 2;
+      if (probe >= faqEl.offsetTop)   active = 3;
+      setActiveSlide(active);
+    }
+    canvas.addEventListener('scroll', updateActiveFromScroll, { passive: true });
+    setTimeout(updateActiveFromScroll, 100);
 
     document.getElementById('sidebarAdd').addEventListener('click', () => {
       addSlide(true);
